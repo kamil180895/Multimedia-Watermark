@@ -19,7 +19,7 @@ def calculate_ssim(original_frame, compressed_frame):
     ssim_value = ssim(original_gray, compressed_gray)
     return ssim_value
 
-def process_videos(original_video_path, compressed_video_path):
+def calculate_metrics(original_video_path, compressed_video_path):
     """Calculate average PSNR and SSIM for two videos."""
     original_cap = cv2.VideoCapture(original_video_path)
     compressed_cap = cv2.VideoCapture(compressed_video_path)
@@ -47,10 +47,3 @@ def process_videos(original_video_path, compressed_video_path):
     avg_ssim = np.mean(ssim_list)
 
     return avg_psnr, avg_ssim
-
-# Example usage
-original_video = 'input_video.mp4'
-compressed_video = 'watermarked_video.mp4'
-average_psnr, average_ssim = process_videos(original_video, compressed_video)
-print(f"Average PSNR: {average_psnr:.2f}")
-print(f"Average SSIM: {average_ssim:.4f}")

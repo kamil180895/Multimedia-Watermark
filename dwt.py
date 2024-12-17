@@ -73,45 +73,43 @@ def extract_watermark_from_video(original_video_path, watermarked_video_path, al
     cv2.imwrite("extracted_watermark.png", watermark)
     print("Extracted watermark saved as extracted_watermark.png")
 
+def apply_watermark(filepath):
+    alpha_parameter = 0.2
+    # Paths for the input and output
+    video_path = filepath
+    watermark_path = "watermark.png"
+    output_path = "watermarked_video.mp4"
 
-alpha_parameter = 0.2
-# Paths for the input and output
-video_path = "input_video.mp4"
-watermark_path = "watermark.png"
-output_path = "watermarked_video.mp4"
+    # Load the watermark
+    watermark = cv2.imread(watermark_path, cv2.IMREAD_GRAYSCALE)
 
-# Load the watermark
-watermark = cv2.imread(watermark_path, cv2.IMREAD_GRAYSCALE)
+    # Open the input video
+    cap = cv2.VideoCapture(video_path)
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-# Open the input video
-cap = cv2.VideoCapture(video_path)
-frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-fps = cap.get(cv2.CAP_PROP_FPS)
-frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    # Define the codec and create VideoWriter for the output
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height), isColor=False)
 
-# Define the codec and create VideoWriter for the output
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-out = cv2.VideoWriter(output_path, fourcc, fps, (frame_width, frame_height), isColor=False)
+    print("Processing video...")
+    for i in range(frame_count):
+        ret, frame = cap.read()
+        if not ret:
+            break
 
-print("Processing video...")
-for i in range(frame_count):
-    ret, frame = cap.read()
-    if not ret:
-        break
+        # Convert to grayscale
+        gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-    # Convert to grayscale
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Embed the watermark into the frame
+        watermarked_frame = embed_watermark_frame(gray_frame, watermark, alpha_parameter)
 
-    # Embed the watermark into the frame
-    watermarked_frame = embed_watermark_frame(gray_frame, watermark, alpha_parameter)
+        # Write the frame to the output video
+        out.write(watermarked_frame)
 
-    # Write the frame to the output video
-    out.write(watermarked_frame)
-
-cap.release()
-out.release()
-print("Watermarked video saved to:", output_path)
-
-# Uncomment to extract watermark from the watermarked video
-extract_watermark_from_video("input_video.mp4", "watermarked_video.mp4", alpha_parameter)
+    cap.release()
+    out.release()
+    print("Watermarked video saved to:", output_path)
+    return output_path

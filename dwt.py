@@ -37,7 +37,7 @@ def extract_watermark_frame(watermarked_frame, original_frame, alpha=0.2):
     return np.clip(extracted_watermark, 0, 255).astype(np.uint8)
 
 
- #Extraction Example
+#Extraction Example
 def extract_watermark_from_video(original_video_path, watermarked_video_path, alpha=0.2):
     """
     Extract the watermark from a watermarked video.
